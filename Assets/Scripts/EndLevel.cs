@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EndLevel : MonoBehaviour
 {
@@ -6,9 +7,10 @@ public class EndLevel : MonoBehaviour
     {
         PlayerMovement playerMovement;
         playerMovement = collision.gameObject.GetComponent<PlayerMovement>();
-        if (collision.gameObject.CompareTag("Finish"))
+        if (playerMovement !=null)
         {
-            
+            SceneManager.LoadScene("Upgrades");
+
         }
     }
 }

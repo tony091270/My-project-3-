@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     private SpriteRenderer sprite;
     private Animator anim;
     private BoxCollider2D coll;
+    public bool candoublejump;
+    private int jumpcounter;
 
     private float dirX = 0f;
     
@@ -16,7 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask jumpableGround;
 
     private enum MovementState { idle, running, jumping, falling }
-    private bool doubleJump;
+
 
     // Start is called before the first frame update
     private void Start()
@@ -37,18 +39,26 @@ public class PlayerMovement : MonoBehaviour
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
 
-        if (IsGrounded() && !Input.GetButton("Jump"))
-        {
-            doubleJump = false;
-        }
 
-        if (Input.GetButtonDown("Jump") && (IsGrounded() || doubleJump))
+        if (Input.GetButtonDown("Jump") && IsGrounded())
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            doubleJump = !doubleJump;
-        } 
+            jumpcounter++;
+            Debug.Log("jump1test");
+        }
+        Debug.Log(jumpcounter);
+        Debug.Log(IsGrounded());
 
-        UpdateAnimationState();
+        if (Input.GetButtonDown("Jump") && jumpcounter<2)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce); 
+            jumpcounter++;
+        }
+
+        
+
+
+            UpdateAnimationState();
     }
 
 
@@ -88,7 +98,19 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpableGround);
+        var boxcastsize = coll.bounds.size;
+        boxcastsize.y *= 0.9f;
+        boxcastsize.x *= 0.9f;
+        var result = Physics2D.BoxCast(coll.bounds.center, boxcastsize, 0f, Vector2.down, .1f, jumpableGround);
+        if(result.collider !=null)
+        {
+            jumpcounter = 0;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
    
