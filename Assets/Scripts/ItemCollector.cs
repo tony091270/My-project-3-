@@ -7,6 +7,7 @@ public class ItemCollector : MonoBehaviour
 {
 
     private int cherries = 0;
+    public int Cherries => cherries;
 
     [SerializeField] private Text cherriesText;
 
@@ -21,4 +22,9 @@ public class ItemCollector : MonoBehaviour
         }
     }
 
+
+    public void HandleCherriesSpent(int CherriesSpent)
+    {
+        cherries -= CherriesSpent;
+    }
 }

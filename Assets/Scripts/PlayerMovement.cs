@@ -16,6 +16,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 14f;
     [SerializeField] private LayerMask jumpableGround;
+    [SerializeField] private float boxsizemodifierx = .75f;
+    private float lastjumptime;
+    private float jumpcooldown = .2f;
+    [SerializeField] private Transform boxcaststart;
 
     private enum MovementState { idle, running, jumping, falling }
 
@@ -23,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        gameObject.tag = "Player";
         Debug.Log("Hello, World!");
         rb = GetComponent<Rigidbody2D>();
         coll = GetComponent<BoxCollider2D>();
@@ -39,23 +44,17 @@ public class PlayerMovement : MonoBehaviour
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
 
-
-        if (Input.GetButtonDown("Jump") && IsGrounded())
-        {
+        if(Time.time > lastjumptime+jumpcooldown&& IsGrounded())
+            {
+            jumpcounter = 0;
+            }
+        
+        if(Input.GetButtonDown("Jump") && jumpcounter<(candoublejump ? 2:1))
+            {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             jumpcounter++;
-            Debug.Log("jump1test");
-        }
-        Debug.Log(jumpcounter);
-        Debug.Log(IsGrounded());
-
-        if (Input.GetButtonDown("Jump") && jumpcounter<2)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce); 
-            jumpcounter++;
-        }
-
-        
+            lastjumptime = Time.time;
+            }
 
 
             UpdateAnimationState();
@@ -98,19 +97,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsGrounded()
     {
-        var boxcastsize = coll.bounds.size;
-        boxcastsize.y *= 0.9f;
-        boxcastsize.x *= 0.9f;
-        var result = Physics2D.BoxCast(coll.bounds.center, boxcastsize, 0f, Vector2.down, .1f, jumpableGround);
-        if(result.collider !=null)
-        {
-            jumpcounter = 0;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return Physics2D.OverlapBox(boxcaststart.position, new Vector2(coll.size.x * boxsizemodifierx, .1f), 0f, jumpableGround);
     }
 
    
