@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Cherry
   - Trap
+  - Spike
   layers:
   - Default
   - TransparentFX
